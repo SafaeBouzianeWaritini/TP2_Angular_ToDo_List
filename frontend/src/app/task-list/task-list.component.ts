@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Task } from '../task.model';
@@ -22,7 +22,10 @@ export class TaskListComponent implements OnInit {
   editTitle = '';
   editDescription = '';
 
-  constructor(private taskService: TaskService) {}
+  constructor(
+    private taskService: TaskService,
+    private cdr: ChangeDetectorRef   
+  ) {}
 
   ngOnInit(): void {
     this.loadTasks();
@@ -31,7 +34,10 @@ export class TaskListComponent implements OnInit {
   // Charger toutes les tâches depuis l'API
   loadTasks(): void {
     this.taskService.getTasks().subscribe({
-      next: (data) => (this.tasks = data),
+      next: (data) => {
+        this.tasks = data;
+        this.cdr.markForCheck();   // ← prévient Angular de rafraîchir l'écran
+      },
       error: (err) => console.error('Erreur chargement', err)
     });
   }
